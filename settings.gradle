@@ -1,0 +1,5 @@
+rootProject.name='KindGenerate'
+include ':app'
+include ':generate-annotations'
+include ':generate'
+include ':generate-compile'
