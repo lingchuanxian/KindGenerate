@@ -1,8 +1,17 @@
 package cn.com.kind.android.library.generate.compile;
 
 import com.google.auto.service.AutoService;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.TypeSpec;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -12,7 +21,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
@@ -74,48 +83,71 @@ public class GenerateProcessor extends AbstractProcessor {
      */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        //得到所有包含该注解的element集合
-
-        for (Element element : roundEnv.getElementsAnnotatedWith(KindListActivity.class)) {
-            String busikey = element.getAnnotation(KindListActivity.class).busikey();
-            //mMessager.printMessage(Diagnostic.Kind.NOTE, busikey, element);
-            //可以获取类的信息的element，也是element的子类
-            TypeElement classElement = (TypeElement) element.getEnclosingElement();
-            //获取包名加类名
-           // String fullClassName = classElement.getQualifiedName().toString();
-            //mMessager.printMessage(Diagnostic.Kind.NOTE, element.getSimpleName(), element);
-//            //保存到集合中
-//            ClassCreatorFactory factory = mClassCreatorFactoryMap.get(fullClassName);
-//            if (factory == null) {
-//                factory = new ClassCreatorFactory(mElementUtils, classElement);
-//                mClassCreatorFactoryMap.put(fullClassName, factory);
-//            }
-        }
-        //generateKindListActivityManager();
+        handleKindListActivityAnnotation(roundEnv);
         return false;
+    }
+
+    /**
+     * 处理KindListActivity注解相关
+     * @param roundEnv
+     */
+    private void handleKindListActivityAnnotation(RoundEnvironment roundEnv) {
+        //存储类名的集合
+        List<ListActivityModel> activityModelList = new ArrayList<>();
+        //得到所有包含该注解的element集合
+        Set<TypeElement> typeElementSet = (Set<TypeElement>) roundEnv.getElementsAnnotatedWith(KindListActivity.class);
+        for (TypeElement element : typeElementSet) {
+            String busikey = element.getAnnotation(KindListActivity.class).busikey();
+            //获取类名
+            String className = element.getSimpleName().toString();
+            //获取包名加类名
+            String fullClassName = element.getQualifiedName().toString();
+
+            activityModelList.add(new ListActivityModel(busikey,className,fullClassName, ClassName.get(element)));
+        }
+        generateKindListActivityManager(activityModelList);
     }
 
     /**
      * 生成KindListActivityManager管理类
      */
-    private void generateKindListActivityManager() {
-//        MethodSpec methodMain = MethodSpec.methodBuilder("main")//创建main方法
-//                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)//定义修饰符为 public static
-//                .addJavadoc("@  此类由apt自动生成")//在生成的代码前添加注释
-//                .returns(void.class)//定义返回类型
-//                .addParameter(String[].class, "args")//定义方法参数
-//                .addStatement("$T.out.println($S)", System.class, "helloWorld")//定义方法体
-//                .build();
-//        TypeSpec helloWorld = TypeSpec.classBuilder("HelloWorld")//创建HelloWorld类
-//                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)//定义修饰符为 public final
-//                .addMethod(methodMain)//添加方法
-//                .addJavadoc("@  此方法由apt自动生成")//定义方法参数
-//                .build();
-//        JavaFile javaFile = JavaFile.builder("com.tuodao.apt", helloWorld).build();// 生成源   代码
-//        try {
-//            javaFile.writeTo(mAbstractProcessor.mFiler);//// 在 app module/build/generated/source/apt 生成一份源代码
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+    private void generateKindListActivityManager(List<ListActivityModel> activityModelList) {
+        CodeBlock.Builder build =  CodeBlock.builder();
+        for (ListActivityModel activityModel : activityModelList){
+           String caseCode = "case \"" + activityModel.getBusikey() + "\":\n" +
+                    "clazz = $T.class;\n";
+            build.add(caseCode,activityModel.getClassNameObj());
+        }
+        build.add("default:\n");
+        build.addStatement("clazz = null");
+
+        MethodSpec methodMain = MethodSpec.methodBuilder("getListActivity")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(Class.class)
+                .addParameter(String.class, "busikey")
+                .addStatement("$T clazz = null",Class.class)
+                .beginControlFlow("switch (busikey)")
+                .addCode(build.build())
+                .endControlFlow()
+                .addStatement("return clazz")
+                .build();
+
+
+        TypeSpec kindListActivityManager = TypeSpec.classBuilder("KindListActivityManager")
+                .addModifiers(Modifier.PUBLIC)
+                .addMethod(methodMain)
+                .addJavadoc("@author ling_cx")
+                .addJavadoc("\n@description 列表activity管理类")
+                .addJavadoc("\n@date " + new SimpleDateFormat("yyyy/MM/dd hh:mm").format(new Date()))
+                .addJavadoc("\n@Copyright: 2020 www.kind.com.cn Inc. All rights reserved." )
+                .build();
+        JavaFile javaFile = JavaFile.builder("cn.com.kind.android.library.kindgenerate.result", kindListActivityManager)
+                .build();
+
+        try {
+            javaFile.writeTo(mFiler);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
