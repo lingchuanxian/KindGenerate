@@ -1,0 +1,70 @@
+//上传Maven的gradle脚本
+apply plugin: 'maven'
+def extConfig = rootProject.ext
+
+def repositoryConfig = extConfig.repositoryConfig
+def mavenConfig = extConfig.mavenConfig
+
+//repositoryConfig
+def releaseRepoUrl = repositoryConfig.urlRelease
+def snapshotRepoUrl = repositoryConfig.urlSnapshot
+def userName = repositoryConfig.userName
+def userPassword = repositoryConfig.password
+
+//mavenConfig
+def pomName = mavenConfig.pomName
+def pomReleaseVersion = mavenConfig.pomReleaseVersion
+def pomSnapshotsVersion = mavenConfig.pomSnapshotsVersion
+def pomGroupId = mavenConfig.pomGroupId
+def pomAritfaceId = mavenConfig.pomAritfaceId
+def pomPackageing = mavenConfig.pomPackageing
+def pomDescription = mavenConfig.pomDescription
+def pomUploadType = mavenConfig.pomUploadType
+
+def repoUrl
+def pomVersion
+
+uploadArchives {
+    group 'kindtask'
+    if (pomUploadType == "RELEASE") {
+        repoUrl = releaseRepoUrl
+        pomVersion = pomReleaseVersion
+    } else if (pomUploadType == "SNAPSHOT"){
+        repoUrl = snapshotRepoUrl
+        pomVersion = pomSnapshotsVersion
+    } else {
+        throw Exception(">>>>>>>>>>>>>>上传失败，pomUploadType = " + pomUploadType + " ,请确认config_upload.gradle文件中 pomUploadType 参数填写正确，POM版本必须为（RELEASE、SNAPSHOT）中的一种类型<<<<<<<<<<");
+    }
+    println "pomUploadType = " + pomUploadType
+    println "pomVersion = " + pomVersion
+    println "repoUrl = " + repoUrl +"\n"
+
+    repositories.mavenDeployer {
+        repository(url: repoUrl) {
+            authentication(userName: userName,
+                    password: userPassword)
+        }
+
+        pom.project {
+            name pomName
+            description pomDescription
+            url repoUrl
+            groupId pomGroupId
+            artifactId pomAritfaceId
+            version pomVersion
+            packaging pomPackageing
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+        }
+    }
+}
+
+task cleanDir(type:Delete) {
+    delete buildDir
+}
+
+uploadArchives.mustRunAfter 'cleanDir'

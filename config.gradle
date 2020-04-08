@@ -1,0 +1,12 @@
+
+ext {
+    //android编译环境设置
+    android = [
+            compileSdkVersion       : 29,
+            buildToolsVersion       : "29.0.1",
+            minSdkVersion           : 18,
+            targetSdkVersion        : 26
+    ]
+
+}
+

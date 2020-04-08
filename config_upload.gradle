@@ -1,0 +1,31 @@
+ext {
+    repositoryConfig = [
+            userName : "admin",
+            password : "fjkind",
+            urlRelease : "http://192.168.0.29:8081/repository/kind-android-release/",
+            urlSnapshot : "http://192.168.0.29:8081/repository/kind-android-snapshots/"
+    ]
+
+    mavenConfig = [
+            pomName : "KindGenerate",
+            pomReleaseVersion : "0.0.1-RELEASE",//release版本
+            pomSnapshotsVersion : "0.0.1-SNAPSHOT",//Snapshots版本
+            pomGroupId : "cn.com.kind",
+            pomAritfaceId : "kindgenerate",
+            pomPackageing : "aar",
+            pomDescription : "Kind开发库",
+            pomUploadType : "SNAPSHOT" //RELEASE 、SNAPSHOT
+    ]
+
+    mavenCompileConfig = [
+            pomName : "KindGenerate-Compile",
+            pomReleaseVersion : "0.0.1-RELEASE",//release版本
+            pomSnapshotsVersion : "0.0.1-SNAPSHOT",//Snapshots版本
+            pomGroupId : "cn.com.kind",
+            pomAritfaceId : "kindgenerate-compile",
+            pomPackageing : "aar",
+            pomDescription : "Kind开发库apt",
+            pomUploadType : "SNAPSHOT" //RELEASE 、SNAPSHOT
+    ]
+
+}
