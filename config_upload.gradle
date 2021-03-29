@@ -17,13 +17,25 @@ ext {
             pomUploadType : "SNAPSHOT" //RELEASE 、SNAPSHOT
     ]
 
+    mavenAnnotationsConfig = [
+            pomName : "KindGenerate-Annotations",
+            pomReleaseVersion : "0.0.1-RELEASE",//release版本
+            pomSnapshotsVersion : "0.0.2-SNAPSHOT",//Snapshots版本
+            pomGroupId : "cn.com.kind",
+            pomAritfaceId : "kindgenerate-annotations",
+            pomPackageing : "jar",
+            pomDescription : "Kind开发库注解",
+            pomUploadType : "SNAPSHOT" //RELEASE 、SNAPSHOT
+    ]
+
+
     mavenCompileConfig = [
             pomName : "KindGenerate-Compile",
             pomReleaseVersion : "0.0.1-RELEASE",//release版本
             pomSnapshotsVersion : "0.0.1-SNAPSHOT",//Snapshots版本
             pomGroupId : "cn.com.kind",
             pomAritfaceId : "kindgenerate-compile",
-            pomPackageing : "aar",
+            pomPackageing : "jar",
             pomDescription : "Kind开发库apt",
             pomUploadType : "SNAPSHOT" //RELEASE 、SNAPSHOT
     ]

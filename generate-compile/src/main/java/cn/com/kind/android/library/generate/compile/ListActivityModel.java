@@ -10,23 +10,23 @@ import com.squareup.javapoet.ClassName;
  * @Copyright: 2020 www.kind.com.cn Inc. All rights reserved.
  */
 public class ListActivityModel {
-    private String busikey;
+    private String[] busikey;
     private String className;
     private String classFullName;
     private ClassName classNameObj;
 
-    public ListActivityModel(String busikey, String className, String classFullName, ClassName classNameObj) {
+    public ListActivityModel(String[] busikey, String className, String classFullName, ClassName classNameObj) {
         this.busikey = busikey;
         this.className = className;
         this.classFullName = classFullName;
         this.classNameObj = classNameObj;
     }
 
-    public String getBusikey() {
+    public String[] getBusikey() {
         return busikey;
     }
 
-    public void setBusikey(String busikey) {
+    public void setBusikey(String[] busikey) {
         this.busikey = busikey;
     }
 

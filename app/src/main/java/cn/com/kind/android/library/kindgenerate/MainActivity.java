@@ -8,7 +8,7 @@ import cn.com.kind.android.library.generate.annotations.KindListActivity;
 /**
  * @author lingchuanxian
  */
-@KindListActivity(busikey = "collectdoc")
+@KindListActivity(busikey = {"collectdoc","Contract"})
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

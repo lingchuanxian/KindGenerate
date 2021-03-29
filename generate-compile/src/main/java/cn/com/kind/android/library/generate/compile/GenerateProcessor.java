@@ -97,7 +97,7 @@ public class GenerateProcessor extends AbstractProcessor {
         //得到所有包含该注解的element集合
         Set<TypeElement> typeElementSet = (Set<TypeElement>) roundEnv.getElementsAnnotatedWith(KindListActivity.class);
         for (TypeElement element : typeElementSet) {
-            String busikey = element.getAnnotation(KindListActivity.class).busikey();
+            String[] busikey = element.getAnnotation(KindListActivity.class).busikey();
             //获取类名
             String className = element.getSimpleName().toString();
             //获取包名加类名
@@ -114,12 +114,17 @@ public class GenerateProcessor extends AbstractProcessor {
     private void generateKindListActivityManager(List<ListActivityModel> activityModelList) {
         CodeBlock.Builder build =  CodeBlock.builder();
         for (ListActivityModel activityModel : activityModelList){
-           String caseCode = "case \"" + activityModel.getBusikey() + "\":\n" +
-                    "clazz = $T.class;\n";
+           String caseCode = "";
+           for (String busikey : activityModel.getBusikey()){
+               caseCode += "case \"" + busikey + "\":\n";
+           }
+            caseCode += "clazz = $T.class;\n";
             build.add(caseCode,activityModel.getClassNameObj());
+            build.addStatement("break");
         }
         build.add("default:\n");
         build.addStatement("clazz = null");
+        build.addStatement("break");
 
         MethodSpec methodMain = MethodSpec.methodBuilder("getListActivity")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
